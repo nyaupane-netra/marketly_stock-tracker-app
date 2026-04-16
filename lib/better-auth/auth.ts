@@ -11,10 +11,21 @@ if (!db) {
     throw new Error("MongoDB connection not found");
 }
 
+const appBaseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "";
+const trustedOrigins = [
+    appBaseURL,
+    process.env.NEXT_PUBLIC_BASE_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "",
+    "http://localhost:3000",
+]
+    .filter((origin): origin is string => Boolean(origin))
+    .map((origin) => origin.replace(/\/$/, ""));
+
 export const auth = betterAuth({
     database: mongodbAdapter(db, { client }),
     secret: process.env.BETTER_AUTH_SECRET!,
-    baseURL: process.env.BETTER_AUTH_URL!,
+    baseURL: appBaseURL,
+    trustedOrigins,
     user: {
         additionalFields: {
             phoneNumber: {
