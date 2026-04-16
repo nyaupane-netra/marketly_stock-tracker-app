@@ -4,6 +4,8 @@ export interface WatchlistItem extends Document {
     userId: string;
     symbol: string;
     company: string;
+    note?: string;
+    category?: string;
     addedAt: Date;
 }
 
@@ -12,6 +14,8 @@ const WatchlistSchema = new Schema<WatchlistItem>(
         userId: { type: String, required: true, index: true },
         symbol: { type: String, required: true, uppercase: true, trim: true },
         company: { type: String, required: true, trim: true },
+        note: { type: String, default: '', trim: true },
+        category: { type: String, default: 'General', trim: true },
         addedAt: { type: Date, default: Date.now },
     },
     { timestamps: false }

@@ -1,5 +1,4 @@
 import React from 'react'
-import {Button} from "@/components/ui/button";
 import TradingViewWidget from "@/components/TradingViewWidget";
 import {
     HEATMAP_WIDGET_CONFIG,

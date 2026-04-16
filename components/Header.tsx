@@ -4,10 +4,16 @@ import Image from "next/image";
 import NavItems from "@/components/NavItems";
 import UserDropdown from "@/components/UserDropdown";
 import {searchStocks} from "@/lib/actions/finnhub.actions";
+import NotificationCenter from "@/components/NotificationCenter";
+import {getNotifications, getUnreadNotificationCount} from "@/lib/actions/notification.actions";
 
 const Header = async ({ user }: { user: User }) => {
 
-    const initialStocks = await searchStocks();
+    const [initialStocks, notifications, unreadCount] = await Promise.all([
+        searchStocks(),
+        getNotifications(),
+        getUnreadNotificationCount(),
+    ]);
 
     return (
         <header className="sticky top-0 header">
@@ -18,7 +24,10 @@ const Header = async ({ user }: { user: User }) => {
                 <nav className="hidden sm:block">
                     <NavItems initialStocks={initialStocks} />
                 </nav>
-                <UserDropdown user={user} initialStocks={initialStocks} />
+                <div className="header-actions">
+                    <NotificationCenter notifications={notifications} unreadCount={unreadCount} />
+                    <UserDropdown user={user} initialStocks={initialStocks} />
+                </div>
             </div>
         </header>
     )
