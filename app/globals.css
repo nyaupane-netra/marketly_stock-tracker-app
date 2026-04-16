@@ -391,13 +391,13 @@
     @apply text-gray-500 mb-6 max-w-md;
   }
   .watchlist-container {
-    @apply flex flex-col-reverse xl:grid xl:grid-cols-[minmax(0,1fr)_380px] gap-8;
+    @apply grid grid-cols-1 gap-8 2xl:grid-cols-[minmax(0,1fr)_390px];
   }
   .watchlist {
     @apply space-y-8;
   }
   .watchlist-alerts {
-    @apply sticky top-24 items-start gap-6 h-fit flex-col w-full;
+    @apply order-first w-full 2xl:order-none 2xl:sticky 2xl:top-24 2xl:h-fit;
   }
   .watchlist-icon-btn {
     @apply w-fit cursor-pointer hover:bg-transparent! text-gray-400 hover:text-yellow-500;
@@ -595,7 +595,7 @@
     @apply mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-300;
   }
   .alert-form-grid {
-    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1;
+    @apply grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-1;
   }
   .alert-form-field {
     @apply flex flex-col gap-2 text-sm font-semibold text-gray-300;
@@ -607,7 +607,7 @@
     @apply mt-4 inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded bg-yellow-500 px-4 text-sm font-semibold text-gray-900 transition-colors hover:bg-yellow-400 disabled:opacity-50;
   }
   .alert-items {
-    @apply flex max-h-[480px] flex-col gap-3 overflow-y-auto pr-1;
+    @apply flex max-h-[320px] flex-col gap-3 overflow-y-auto pr-1 2xl:max-h-[420px];
   }
   .alert-items-header {
     @apply text-sm font-bold uppercase tracking-wide text-gray-500;
