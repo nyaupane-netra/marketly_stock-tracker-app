@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
 import { connectToDatabase } from "@/database/mongoose";
-import { inngest } from "@/lib/inngest/client";
+import { sendWelcomeEmail, WELCOME_EMAIL_FALLBACK_INTRO } from "@/lib/nodemailer";
 
 const mongoose = await connectToDatabase();
 const client = mongoose.connection.getClient();
@@ -32,19 +32,13 @@ export const auth = betterAuth({
             create: {
                 async after(user) {
                     try {
-                        await inngest.send({
-                            name: 'app/user.created',
-                            data: {
-                                email: user.email,
-                                name: user.name,
-                                country: 'Not specified',
-                                investmentGoals: 'Not specified',
-                                riskTolerance: 'Not specified',
-                                preferredIndustry: 'Not specified',
-                            },
+                        await sendWelcomeEmail({
+                            email: user.email,
+                            name: user.name || "there",
+                            intro: WELCOME_EMAIL_FALLBACK_INTRO,
                         });
                     } catch (error) {
-                        console.error('Failed to queue welcome email event', error);
+                        console.error('Failed to send welcome email', error);
                     }
                 },
             },

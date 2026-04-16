@@ -8,6 +8,9 @@ import {
 
 export const transporter = nodemailer.createTransport({
     service: 'gmail',
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
     auth: {
         user: process.env.NODEMAILER_EMAIL!,
         pass: process.env.NODEMAILER_PASSWORD!,
@@ -15,11 +18,51 @@ export const transporter = nodemailer.createTransport({
 })
 
 const fromAddress = process.env.NODEMAILER_EMAIL || 'netrap.nyaupane@gmail.com';
+const configuredBaseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.BETTER_AUTH_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+    'https://marketly-stock-tracker-app.vercel.app';
+const appBaseUrl = configuredBaseUrl.replace(/\/+$/, '');
+const dashboardUrl = `${appBaseUrl}/`;
+const newsUrl = `${appBaseUrl}/news`;
+const watchlistUrl = `${appBaseUrl}/watchlist`;
+const unsubscribeUrl = `mailto:${fromAddress}?subject=Unsubscribe%20from%20Marketly%20emails`;
+export const WELCOME_EMAIL_FALLBACK_INTRO =
+    "Thanks for joining Marketly. Your account is ready, and you can now track your watchlist, follow market news, and set alerts for the stocks you care about.";
+
+function escapeHtml(value: string) {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+const applyEmailLinks = (template: string, stockSymbol?: string) => template
+    .replaceAll('{{dashboardUrl}}', dashboardUrl)
+    .replaceAll('{{newsUrl}}', newsUrl)
+    .replaceAll('{{watchlistUrl}}', watchlistUrl)
+    .replaceAll('{{stockUrl}}', stockSymbol ? `${appBaseUrl}/stocks/${encodeURIComponent(stockSymbol)}` : dashboardUrl)
+    .replaceAll('{{unsubscribeUrl}}', unsubscribeUrl);
+
+const buildWelcomeIntroHtml = (intro: string) => {
+    const readableIntro = intro
+        .replaceAll('#CCDADC', '#4b5563')
+        .replaceAll('#ccdadc', '#4b5563');
+
+    if (/<[a-z][\s\S]*>/i.test(readableIntro)) {
+        return readableIntro;
+    }
+
+    return `<p class="mobile-text" style="margin: 0 0 26px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">${escapeHtml(readableIntro)}</p>`;
+};
 
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
-    const htmlTemplate = WELCOME_EMAIL_TEMPLATE
+    const htmlTemplate = applyEmailLinks(WELCOME_EMAIL_TEMPLATE)
         .replace('{{name}}', name)
-        .replace('{{intro}}', intro);
+        .replace('{{intro}}', buildWelcomeIntroHtml(intro));
 
     const mailOptions = {
         from: `"Marketly" <${fromAddress}>`,
@@ -35,7 +78,7 @@ export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData)
 export const sendNewsSummaryEmail = async (
     { email, date, newsContent }: { email: string; date: string; newsContent: string }
 ): Promise<void> => {
-    const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE
+    const htmlTemplate = applyEmailLinks(NEWS_SUMMARY_EMAIL_TEMPLATE)
         .replace('{{date}}', date)
         .replace('{{newsContent}}', newsContent);
 
@@ -68,7 +111,7 @@ export const sendPriceAlertEmail = async ({
     timestamp: string;
 }): Promise<void> => {
     const template = alertType === 'upper' ? STOCK_ALERT_UPPER_EMAIL_TEMPLATE : STOCK_ALERT_LOWER_EMAIL_TEMPLATE;
-    const htmlTemplate = template
+    const htmlTemplate = applyEmailLinks(template, symbol)
         .replaceAll('{{symbol}}', symbol)
         .replaceAll('{{company}}', company)
         .replaceAll('{{currentPrice}}', currentPrice)

@@ -1,9 +1,6 @@
 import { inngest } from "@/lib/inngest/client";
-import {
-    NEWS_SUMMARY_EMAIL_PROMPT,
-    PERSONALIZED_WELCOME_EMAIL_PROMPT,
-} from "@/lib/inngest/prompts";
-import { sendNewsSummaryEmail, sendPriceAlertEmail, sendWelcomeEmail } from "@/lib/nodemailer";
+import { NEWS_SUMMARY_EMAIL_PROMPT } from "@/lib/inngest/prompts";
+import { sendNewsSummaryEmail, sendPriceAlertEmail } from "@/lib/nodemailer";
 import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
 import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
 import { fetchJSON, getNews } from "@/lib/actions/finnhub.actions";
@@ -26,9 +23,6 @@ type PriceAlertRecord = {
     alertType: "upper" | "lower";
     threshold: number;
 };
-
-const fallbackWelcomeIntro =
-    "Thanks for joining Marketly. Your account is ready, and you can now track your watchlist, follow market news, and set alerts for the stocks you care about.";
 
 function escapeHtml(value: string) {
     return value
@@ -65,57 +59,6 @@ function buildFallbackNewsSummary(articles: MarketNewsArticle[]) {
 
     return `<ul style="padding-left: 20px; margin: 0;">${items}</ul>`;
 }
-
-export const sendSignUpEmail = inngest.createFunction(
-    {
-        id: "sign-up-email",
-        triggers: [{ event: "app/user.created" }],
-    },
-    async ({ event, step }) => {
-        const userProfile = `
-            - Country: ${event.data.country}
-            - Investment goals: ${event.data.investmentGoals}
-            - Risk tolerance: ${event.data.riskTolerance}
-            - Preferred industry: ${event.data.preferredIndustry}
-        `;
-
-        const prompt = PERSONALIZED_WELCOME_EMAIL_PROMPT.replace("{{userProfile}}", userProfile);
-
-        let introText = fallbackWelcomeIntro;
-
-        try {
-            const response = await step.ai.infer("generate-welcome-intro", {
-                model: step.ai.models.gemini({ model: "gemini-2.5-flash-lite" }),
-                body: {
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [{ text: prompt }],
-                        },
-                    ],
-                },
-            });
-
-            const part = response.candidates?.[0]?.content?.parts?.[0];
-            introText = (part && "text" in part ? part.text : null) || fallbackWelcomeIntro;
-        } catch (error) {
-            console.error("Gemini welcome intro failed; using fallback copy", error);
-        }
-
-        await step.run("send-welcome-email", async () => {
-            const {
-                data: { email, name },
-            } = event;
-
-            return await sendWelcomeEmail({ email, name, intro: introText });
-        });
-
-        return {
-            success: true,
-            message: "Welcome email sent successfully",
-        };
-    }
-);
 
 export const sendDailyNewsSummary = inngest.createFunction(
     {

@@ -32,7 +32,7 @@ IMPORTANT: Do NOT start the personalized content with "Welcome" since the email 
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Return ONLY clean HTML content with NO markdown, NO code blocks, NO backticks
-- Use SINGLE paragraph only: <p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">content</p>
+- Use SINGLE paragraph only: <p class="mobile-text" style="margin: 0 0 26px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">content</p>
 - Write exactly TWO sentences (add one more sentence than current single sentence)
 - Keep total content between 35-50 words for readability
 - Use <strong> for key personalized elements (their goals, sectors, etc.)
@@ -41,11 +41,11 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Second sentence should add helpful context or reinforce the personalization
 
 Example personalized outputs (showing obvious customization with TWO sentences):
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Thanks for joining Marketly! As someone focused on <strong>technology growth stocks</strong>, you'll love our real-time alerts for companies like the ones you're tracking. We'll help you spot opportunities before they become mainstream news.</p>
+<p class="mobile-text" style="margin: 0 0 26px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">Thanks for joining Marketly! As someone focused on <strong>technology growth stocks</strong>, you'll love our real-time alerts for companies like the ones you're tracking. We'll help you spot opportunities before they become mainstream news.</p>
 
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Great to have you aboard! Perfect for your <strong>conservative retirement strategy</strong> — we'll help you monitor dividend stocks without overwhelming you with noise. You can finally track your portfolio progress with confidence and clarity.</p>
+<p class="mobile-text" style="margin: 0 0 26px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">Great to have you aboard! Perfect for your <strong>conservative retirement strategy</strong> — we'll help you monitor dividend stocks without overwhelming you with noise. You can finally track your portfolio progress with confidence and clarity.</p>
 
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">You're all set! Since you're new to investing, we've designed simple tools to help you build confidence while learning the <strong>healthcare sector</strong> you're interested in. Our beginner-friendly alerts will guide you without the confusing jargon.</p>`
+<p class="mobile-text" style="margin: 0 0 26px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">You're all set! Since you're new to investing, we've designed simple tools to help you build confidence while learning the <strong>healthcare sector</strong> you're interested in. Our beginner-friendly alerts will guide you without the confusing jargon.</p>`
 
 export const NEWS_SUMMARY_EMAIL_PROMPT = `Generate HTML content for a market news summary email that will be inserted into the NEWS_SUMMARY_EMAIL_TEMPLATE at the {{newsContent}} placeholder.
 
@@ -164,7 +164,7 @@ Stock Market Had Mixed Results Today
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="https://example.com/article1" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>
 
@@ -194,7 +194,7 @@ Apple Stock Jumped After Great Earnings Report
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="https://example.com/article2" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>`
 
