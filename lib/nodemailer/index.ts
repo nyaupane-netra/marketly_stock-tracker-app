@@ -14,13 +14,15 @@ export const transporter = nodemailer.createTransport({
     }
 })
 
+const fromAddress = process.env.NODEMAILER_EMAIL || 'netrap.nyaupane@gmail.com';
+
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
     const htmlTemplate = WELCOME_EMAIL_TEMPLATE
         .replace('{{name}}', name)
         .replace('{{intro}}', intro);
 
     const mailOptions = {
-        from: `"Marketly" <netrap.nyaupane@gmail.com>`,
+        from: `"Marketly" <${fromAddress}>`,
         to: email,
         subject: `Welcome to Marketly - your stock market toolkit is ready!`,
         text: 'Thanks for joining Marketly',
@@ -38,7 +40,7 @@ export const sendNewsSummaryEmail = async (
         .replace('{{newsContent}}', newsContent);
 
     const mailOptions = {
-        from: `"Marketly News" <netrap.nyaupane@gmail.com>`,
+        from: `"Marketly News" <${fromAddress}>`,
         to: email,
         subject: `📈 Market News Summary Today - ${date}`,
         text: `Today's market news summary from Marketly`,
@@ -74,7 +76,7 @@ export const sendPriceAlertEmail = async ({
         .replaceAll('{{timestamp}}', timestamp);
 
     const mailOptions = {
-        from: `"Marketly Alerts" <netrap.nyaupane@gmail.com>`,
+        from: `"Marketly Alerts" <${fromAddress}>`,
         to: email,
         subject: `Marketly price alert: ${symbol} ${alertType === 'upper' ? 'moved above' : 'dropped below'} ${targetPrice}`,
         text: `${symbol} triggered your price alert at ${currentPrice}.`,

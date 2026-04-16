@@ -27,6 +27,45 @@ type PriceAlertRecord = {
     threshold: number;
 };
 
+const fallbackWelcomeIntro =
+    "Thanks for joining Marketly. Your account is ready, and you can now track your watchlist, follow market news, and set alerts for the stocks you care about.";
+
+function escapeHtml(value: string) {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function buildFallbackNewsSummary(articles: MarketNewsArticle[]) {
+    if (!articles.length) {
+        return "<p>No major market news was available for your watchlist today.</p>";
+    }
+
+    const items = articles
+        .slice(0, 6)
+        .map((article) => {
+            const headline = escapeHtml(article.headline);
+            const source = escapeHtml(article.source || "Market News");
+            const summary = escapeHtml(article.summary || "Open the full article for details.");
+            const url = escapeHtml(article.url);
+
+            return `
+                <li style="margin-bottom: 16px;">
+                    <strong>${headline}</strong><br />
+                    <span style="color: #9095A1;">${source}</span><br />
+                    <span>${summary}</span><br />
+                    <a href="${url}" style="color: #E8BA40;">Read more</a>
+                </li>
+            `;
+        })
+        .join("");
+
+    return `<ul style="padding-left: 20px; margin: 0;">${items}</ul>`;
+}
+
 export const sendSignUpEmail = inngest.createFunction(
     {
         id: "sign-up-email",
@@ -42,24 +81,28 @@ export const sendSignUpEmail = inngest.createFunction(
 
         const prompt = PERSONALIZED_WELCOME_EMAIL_PROMPT.replace("{{userProfile}}", userProfile);
 
-        const response = await step.ai.infer("generate-welcome-intro", {
-            model: step.ai.models.gemini({ model: "gemini-2.5-flash-lite" }),
-            body: {
-                contents: [
-                    {
-                        role: "user",
-                        parts: [{ text: prompt }],
-                    },
-                ],
-            },
-        });
+        let introText = fallbackWelcomeIntro;
+
+        try {
+            const response = await step.ai.infer("generate-welcome-intro", {
+                model: step.ai.models.gemini({ model: "gemini-2.5-flash-lite" }),
+                body: {
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [{ text: prompt }],
+                        },
+                    ],
+                },
+            });
+
+            const part = response.candidates?.[0]?.content?.parts?.[0];
+            introText = (part && "text" in part ? part.text : null) || fallbackWelcomeIntro;
+        } catch (error) {
+            console.error("Gemini welcome intro failed; using fallback copy", error);
+        }
 
         await step.run("send-welcome-email", async () => {
-            const part = response.candidates?.[0]?.content?.parts?.[0];
-            const introText =
-                (part && "text" in part ? part.text : null) ||
-                "Thanks for joining Marketly. You now have the tools to track markets and make smarter moves.";
-
             const {
                 data: { email, name },
             } = event;
@@ -138,8 +181,8 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
                 userNewsSummaries.push({ user, newsContent });
             } catch (e) {
-                console.error("Failed to summarize news for : ", user.email);
-                userNewsSummaries.push({ user, newsContent: null });
+                console.error("Failed to summarize news for : ", user.email, e);
+                userNewsSummaries.push({ user, newsContent: buildFallbackNewsSummary(articles) });
             }
         }
 
