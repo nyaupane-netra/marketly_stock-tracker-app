@@ -12,6 +12,23 @@ declare global {
         investmentGoals: string;
         riskTolerance: string;
         preferredIndustry: string;
+        image?: string;
+    };
+
+    type UpdateProfileFormData = {
+        name: string;
+        phoneNumber: string;
+        image?: string | null;
+    };
+
+    type ChangePasswordFormData = {
+        currentPassword: string;
+        newPassword: string;
+    };
+
+    type WatchlistDetailsFormData = {
+        note: string;
+        category: string;
     };
 
     type CountrySelectProps = {
@@ -71,6 +88,8 @@ declare global {
         id: string;
         name: string;
         email: string;
+        image?: string | null;
+        phoneNumber?: string | null;
     };
 
     type Stock = {
@@ -139,6 +158,8 @@ declare global {
         userId: string;
         symbol: string;
         company: string;
+        note?: string;
+        category?: string;
         addedAt: Date;
         currentPrice?: number;
         changePercent?: number;
@@ -146,6 +167,22 @@ declare global {
         changeFormatted?: string;
         marketCap?: string;
         peRatio?: string;
+    };
+
+    type StockOverview = {
+        symbol: string;
+        company: string;
+        exchange: string;
+        industry: string;
+        country: string;
+        website: string;
+        logo: string;
+        currentPrice?: number;
+        changePercent?: number;
+        priceFormatted: string;
+        changeFormatted: string;
+        marketCap: string;
+        peRatio: string;
     };
 
     type AlertsListProps = {
@@ -166,6 +203,7 @@ declare global {
 
     type WatchlistNewsProps = {
         news?: MarketNewsArticle[];
+        symbols?: string[];
     };
 
     type SearchCommandProps = {
@@ -213,7 +251,21 @@ declare global {
         currentPrice: number;
         alertType: 'upper' | 'lower';
         threshold: number;
+        active?: boolean;
+        createdAt?: Date;
+        lastTriggeredAt?: Date;
         changePercent?: number;
+    };
+
+    type AppNotification = {
+        id: string;
+        type: 'price-alert' | 'watchlist' | 'system';
+        title: string;
+        message: string;
+        symbol?: string;
+        url?: string;
+        isRead: boolean;
+        createdAt: Date;
     };
 }
 

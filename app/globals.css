@@ -146,7 +146,21 @@
     @apply mx-auto max-w-screen-2xl px-4 md:px-6 lg:px-8;
   }
   .yellow-btn {
-    @apply h-12 cursor-pointer bg-gradient-to-b from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-gray-950 font-medium text-base rounded-lg shadow-lg disabled:opacity-50;
+    @apply h-12 cursor-pointer bg-gradient-to-b from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-gray-950 font-semibold text-base rounded-lg shadow-lg shadow-yellow-500/10 transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-50;
+  }
+  .social-btn {
+    @apply h-12 cursor-pointer bg-gray-800/90 border border-gray-600 text-gray-100 hover:border-gray-500 hover:bg-gray-700 hover:text-white font-semibold text-base rounded-lg shadow-sm transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60;
+  }
+  .google-mark {
+    @apply mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-sm font-bold text-gray-900;
+  }
+  .auth-divider {
+    @apply mb-5 mt-6 flex items-center gap-3 text-xs uppercase tracking-wide text-gray-500;
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: "";
+    @apply h-px flex-1 bg-gray-600;
   }
   .home-wrapper {
     @apply text-gray-400 flex-col gap-4 md:gap-10 items-center sm:items-start;
@@ -155,22 +169,25 @@
     @apply w-full gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-3;
   }
   .header {
-    @apply z-50 w-full h-[70px] bg-gray-800;
+    @apply z-50 w-full h-[72px] border-b border-gray-700/80 bg-gray-800/95 backdrop-blur;
   }
   .header-wrapper {
-    @apply flex justify-between items-center px-6 py-4 text-gray-500;
+    @apply grid h-full grid-cols-[auto_1fr_auto] items-center gap-4 px-6 py-0 text-gray-500;
+  }
+  .header-actions {
+    @apply flex items-center justify-end gap-3;
   }
   .auth-layout {
-    @apply flex flex-col justify-between lg:flex-row h-screen bg-gray-900 relative overflow-hidden;
+    @apply flex min-h-screen flex-col justify-between bg-gray-900 relative overflow-x-hidden lg:flex-row;
   }
   .auth-logo {
-    @apply pt-6 lg:pt-8 mb-8 lg:mb-12;
+    @apply mb-8 pt-6 lg:mb-10 lg:pt-8;
   }
   .auth-left-section {
-    @apply w-full lg:w-[45%] lg:h-screen px-6 lg:px-16 flex flex-col overflow-y-auto;
+    @apply w-full px-5 sm:px-8 lg:w-1/2 lg:min-h-screen lg:px-12 xl:px-16 flex flex-col overflow-y-auto;
   }
   .auth-right-section {
-    @apply w-full max-lg:border-t max-lg:border-gray-600 lg:w-[55%] lg:h-screen bg-gray-800 px-6 py-4 md:p-6 lg:py-12 lg:px-18 flex flex-col justify-start;
+    @apply w-full max-lg:border-t max-lg:border-gray-600 lg:w-1/2 lg:min-h-screen bg-gray-800 px-6 py-6 md:p-8 lg:py-12 lg:px-14 xl:px-18 flex flex-col justify-start;
   }
   .auth-blockquote {
     @apply text-sm md:text-xl lg:text-2xl font-medium text-gray-400 mb-1 md:mb-6 lg:mb-8;
@@ -181,20 +198,119 @@
   .auth-dashboard-preview {
     @apply border-6 border-gray-800 left-0 hidden w-[1024px] h-auto max-w-none lg:block rounded-xl shadow-2xl;
   }
+  .auth-form-shell {
+    @apply w-full max-w-[620px] pb-10 lg:pb-12;
+  }
+  .auth-form-stack {
+    @apply space-y-4;
+  }
+  .auth-form-grid {
+    @apply grid grid-cols-1 gap-4 xl:grid-cols-2;
+  }
   .form-title {
-    @apply text-4xl font-bold text-gray-400 mb-10;
+    @apply mb-3 text-3xl font-bold leading-tight text-gray-100 sm:text-4xl;
+  }
+  .form-subtitle {
+    @apply mb-6 max-w-xl text-base leading-7 text-gray-400;
   }
   .form-label {
-    @apply text-sm font-medium text-gray-400;
+    @apply text-sm font-semibold text-gray-300;
   }
   .form-input {
-    @apply h-12 px-3 py-3 text-white text-base placeholder:text-gray-500 border-gray-600 bg-gray-800 rounded-lg focus:!border-yellow-500 focus:ring-0;
+    @apply h-12 px-3 py-3 text-white text-base placeholder:text-gray-500 border-gray-600 bg-gray-800/90 rounded-lg shadow-inner shadow-black/20 transition-colors focus:!border-yellow-500 focus:!bg-gray-700/80 focus:ring-0;
+  }
+  .profile-upload-field {
+    @apply relative rounded-lg border border-dashed border-gray-600 bg-gray-800/90 p-4 transition-colors hover:border-yellow-500/70 hover:bg-gray-700/60;
+  }
+  .profile-upload-label {
+    @apply flex cursor-pointer items-center gap-3;
+  }
+  .profile-upload-preview {
+    @apply flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-700 text-gray-300 ring-1 ring-gray-600;
+  }
+  .profile-upload-image {
+    @apply h-full w-full object-cover;
+  }
+  .profile-upload-copy {
+    @apply flex min-w-0 flex-col;
+  }
+  .profile-upload-title {
+    @apply text-sm font-semibold text-gray-100;
+  }
+  .profile-upload-description {
+    @apply mt-1 text-xs text-gray-400;
+  }
+  .profile-upload-remove {
+    @apply absolute right-3 top-3 flex h-7 w-7 cursor-pointer items-center justify-center rounded bg-gray-700 text-gray-400 transition-colors hover:bg-red-500/15 hover:text-red-400;
+  }
+  .profile-dialog {
+    @apply max-h-[calc(100vh-2rem)] overflow-y-auto border-gray-600 bg-gray-800 text-gray-400 shadow-2xl sm:max-w-3xl;
+  }
+  .profile-dialog-title {
+    @apply text-2xl font-bold text-gray-100;
+  }
+  .profile-dialog-description {
+    @apply text-gray-400;
+  }
+  .profile-settings-layout {
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
+  }
+  .profile-settings-card {
+    @apply space-y-5 rounded-lg border border-gray-600 bg-gray-900/55 p-4;
+  }
+  .profile-settings-heading {
+    @apply flex items-start gap-3;
+  }
+  .profile-settings-title {
+    @apply text-base font-semibold text-gray-100;
+  }
+  .profile-settings-copy {
+    @apply mt-1 text-sm leading-6 text-gray-400;
+  }
+  .profile-avatar-editor {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center;
+  }
+  .profile-avatar-preview {
+    @apply h-20 w-20 ring-2 ring-yellow-500/30;
+  }
+  .profile-avatar-actions {
+    @apply flex flex-wrap gap-2;
+  }
+  .profile-photo-btn {
+    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded border border-yellow-500/40 bg-yellow-500/10 px-3 text-sm font-semibold text-yellow-500 transition-colors hover:bg-yellow-500 hover:text-gray-900;
+  }
+  .profile-photo-remove {
+    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded border border-red-500/30 bg-red-500/10 px-3 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500 hover:text-white;
+  }
+  .profile-field {
+    @apply block space-y-2;
+  }
+  .profile-field-label {
+    @apply text-sm font-semibold text-gray-300;
+  }
+  .profile-field-input {
+    @apply h-11 border-gray-600 bg-gray-800 text-gray-100 placeholder:text-gray-500 focus:!border-yellow-500 focus:ring-0;
+  }
+  .profile-input-icon-wrap {
+    @apply relative;
+  }
+  .profile-input-icon {
+    @apply pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500;
+  }
+  .profile-field-input-with-icon {
+    @apply pl-10;
+  }
+  .profile-save-btn {
+    @apply h-11 w-full cursor-pointer rounded bg-yellow-500 font-semibold text-gray-900 hover:bg-yellow-400;
+  }
+  .profile-password-btn {
+    @apply h-11 w-full cursor-pointer rounded border border-teal-400/40 bg-teal-400/10 font-semibold text-teal-400 hover:bg-teal-400 hover:text-gray-900;
   }
   .select-trigger {
-    @apply w-full !h-12 px-3 py-3 text-base border-gray-600 bg-gray-800 text-white rounded-lg focus:!border-yellow-500 focus:ring-0;
+    @apply w-full !h-12 px-3 py-3 text-base border-gray-600 bg-gray-800/90 text-white rounded-lg shadow-inner shadow-black/20 transition-colors focus:!border-yellow-500 focus:!bg-gray-700/80 focus:ring-0;
   }
   .country-select-trigger {
-    @apply h-12 px-3 py-3 text-base w-full justify-between font-normal border-gray-600 bg-gray-800 text-gray-400 rounded-lg focus:!border-yellow-500 focus:ring-0;
+    @apply h-12 px-3 py-3 text-base w-full justify-between font-normal border-gray-600 bg-gray-800/90 text-gray-300 rounded-lg shadow-inner shadow-black/20 transition-colors focus:!border-yellow-500 focus:!bg-gray-700/80 focus:ring-0;
   }
   .country-select-input {
     @apply !bg-gray-800 text-gray-400 border-0 border-b border-gray-600 rounded-none focus:ring-0 placeholder:text-gray-500;
@@ -275,13 +391,13 @@
     @apply text-gray-500 mb-6 max-w-md;
   }
   .watchlist-container {
-    @apply flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8;
+    @apply flex flex-col-reverse xl:grid xl:grid-cols-[minmax(0,1fr)_380px] gap-8;
   }
   .watchlist {
-    @apply lg:col-span-2 space-y-8;
+    @apply space-y-8;
   }
   .watchlist-alerts {
-    @apply items-start gap-6 h-full flex-col w-full lg:col-span-1;
+    @apply sticky top-24 items-start gap-6 h-fit flex-col w-full;
   }
   .watchlist-icon-btn {
     @apply w-fit cursor-pointer hover:bg-transparent! text-gray-400 hover:text-yellow-500;
@@ -304,6 +420,81 @@
   .watchlist-table {
     @apply !relative overflow-hidden !w-full bg-gray-800 border !border-gray-600 !rounded-lg;
   }
+  .watchlist-surface {
+    @apply space-y-5;
+  }
+  .watchlist-toolbar {
+    @apply flex flex-col gap-3 rounded-lg border border-gray-600 bg-gray-800 p-4 md:flex-row md:items-center md:justify-between;
+  }
+  .watchlist-search-wrap {
+    @apply relative w-full md:max-w-md;
+  }
+  .watchlist-search-icon {
+    @apply pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500;
+  }
+  .watchlist-search-input {
+    @apply h-11 w-full rounded border border-gray-600 bg-gray-900 px-10 text-sm text-gray-100 placeholder:text-gray-500 transition-colors focus:border-yellow-500 focus:bg-gray-800 focus:outline-none;
+  }
+  .watchlist-sort {
+    @apply flex h-11 shrink-0 items-center gap-2 rounded border border-gray-600 bg-gray-900 px-3 text-sm font-semibold text-gray-300;
+  }
+  .watchlist-sort select {
+    @apply cursor-pointer bg-transparent text-gray-100 outline-none;
+  }
+  .watchlist-category-filters {
+    @apply flex flex-wrap gap-2;
+  }
+  .watchlist-filter-chip {
+    @apply cursor-pointer rounded border border-gray-600 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-400 transition-colors hover:border-yellow-500/70 hover:text-yellow-500;
+  }
+  .watchlist-filter-chip-active {
+    @apply border-yellow-500 bg-yellow-500/10 text-yellow-500;
+  }
+  .watchlist-filter-empty {
+    @apply rounded-lg border border-dashed border-gray-600 bg-gray-800 p-8 text-center text-gray-500;
+  }
+  .desktop-watchlist-table {
+    @apply hidden lg:block;
+  }
+  .watchlist-card-grid {
+    @apply grid grid-cols-1 gap-4 lg:hidden;
+  }
+  .watchlist-mobile-card {
+    @apply rounded-lg border border-gray-600 bg-gray-800 p-4 shadow-lg shadow-black/10;
+  }
+  .watchlist-card-header {
+    @apply mb-4 flex items-start justify-between gap-4;
+  }
+  .watchlist-card-header h2 {
+    @apply text-xl font-bold text-gray-100;
+  }
+  .watchlist-card-header p {
+    @apply mt-1 line-clamp-2 text-sm text-gray-500;
+  }
+  .watchlist-card-metrics {
+    @apply mb-4 grid grid-cols-2 gap-3;
+  }
+  .watchlist-card-metrics div {
+    @apply rounded border border-gray-600 bg-gray-900/60 p-3;
+  }
+  .watchlist-card-metrics span {
+    @apply block text-xs font-semibold uppercase tracking-wide text-gray-500;
+  }
+  .watchlist-card-metrics strong {
+    @apply mt-1 block text-sm font-bold text-gray-100;
+  }
+  .watchlist-details-form {
+    @apply flex min-w-[220px] flex-col gap-2;
+  }
+  .watchlist-category-input {
+    @apply h-9 w-full rounded border border-gray-600 bg-gray-900 px-3 text-sm font-semibold text-yellow-500 placeholder:text-gray-500 focus:border-yellow-500 focus:outline-none;
+  }
+  .watchlist-note-input {
+    @apply min-h-16 w-full resize-none rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm leading-5 text-gray-300 placeholder:text-gray-500 focus:border-yellow-500 focus:outline-none;
+  }
+  .watchlist-detail-save {
+    @apply h-8 w-fit cursor-pointer rounded border border-gray-600 px-3 text-xs font-semibold text-gray-300 transition-colors hover:border-yellow-500 hover:text-yellow-500 disabled:opacity-50;
+  }
   .table-header-row {
     @apply text-gray-400 font-medium bg-gray-700 border-b border-gray-600 hover:bg-gray-700;
   }
@@ -320,25 +511,55 @@
     @apply flex text-sm items-center whitespace-nowrap gap-1.5 px-3 w-fit py-2 text-yellow-600 border border-yellow-600/20 rounded font-medium bg-transparent hover:bg-transparent cursor-pointer transition-colors;
   }
   .watchlist-news {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5;
+  }
+  .news-section {
+    @apply w-full space-y-5 rounded-lg border border-gray-600 bg-gray-800/60 p-5 sm:p-6;
+  }
+  .news-section-header {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+  .news-eyebrow {
+    @apply mb-2 text-xs font-semibold uppercase tracking-wide text-yellow-500;
+  }
+  .news-section-title {
+    @apply text-2xl font-bold text-gray-100;
+  }
+  .news-section-description {
+    @apply mt-2 max-w-2xl text-sm leading-6 text-gray-400;
   }
   .news-item {
-    @apply bg-gray-800 rounded-lg border w-full border-gray-600  p-4 duration-200 hover:border-gray-600 cursor-pointer;
+    @apply flex min-h-full flex-col overflow-hidden rounded-lg border w-full border-gray-600 bg-gray-800 duration-200 hover:-translate-y-1 hover:border-yellow-500/70 hover:bg-gray-700/70 cursor-pointer;
+  }
+  .news-image {
+    @apply h-40 w-full object-cover bg-gray-700;
+  }
+  .news-item-body {
+    @apply flex flex-1 flex-col p-4;
+  }
+  .news-meta-row {
+    @apply mb-4 flex items-center justify-between gap-3;
   }
   .news-tag {
-    @apply inline-block w-fit px-2 py-1 mb-5 rounded bg-gray-600/60 text-green-500 text-sm font-mono font-medium;
+    @apply inline-block w-fit rounded bg-yellow-500/10 px-2 py-1 text-xs font-mono font-semibold text-yellow-500;
+  }
+  .news-time {
+    @apply shrink-0 text-xs text-gray-500;
   }
   .news-title {
-    @apply text-lg  font-semibold text-gray-100 leading-tight mb-3 line-clamp-2;
+    @apply text-lg font-semibold text-gray-100 leading-tight mb-3 line-clamp-2;
   }
   .news-meta {
     @apply flex items-center text-sm text-gray-500 mb-1;
   }
   .news-summary {
-    @apply text-gray-400 flex-1 text-base leading-relaxed mb-3 line-clamp-3;
+    @apply text-gray-400 flex-1 text-sm leading-6 mb-4 line-clamp-3;
   }
   .news-cta {
-    @apply text-sm align-bottom text-yellow-500 hover:text-gray-400;
+    @apply inline-flex items-center gap-1 text-sm font-semibold text-yellow-500 hover:text-gray-100;
+  }
+  .news-empty {
+    @apply rounded-lg border border-dashed border-gray-600 bg-gray-800 p-8 text-center text-gray-500;
   }
   .alert-dialog {
     @apply bg-gray-800 border-gray-600 text-gray-400 max-w-md;
@@ -347,34 +568,202 @@
     @apply text-xl font-semibold text-gray-100;
   }
   .alert-list {
-    @apply overflow-y-auto w-full max-h-[911px] rounded-lg flex border border-gray-600 flex-col gap-4 bg-gray-800 p-3 flex-1;
+    @apply w-full rounded-lg border border-gray-600 bg-gray-800 p-4 shadow-xl shadow-black/20;
+  }
+  .alert-panel-header {
+    @apply mb-5 flex items-start justify-between gap-4 rounded-lg border border-gray-600 bg-gray-900/70 p-4;
+  }
+  .alert-panel-heading {
+    @apply flex items-start gap-3;
+  }
+  .alert-panel-icon {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded bg-yellow-500/10 text-yellow-500;
+  }
+  .alert-panel-title {
+    @apply text-xl font-bold text-gray-100;
+  }
+  .alert-panel-copy {
+    @apply mt-1 text-sm leading-6 text-gray-400;
+  }
+  .alert-count-pill {
+    @apply shrink-0 rounded bg-teal-400/10 px-2.5 py-1 text-xs font-semibold text-teal-400;
+  }
+  .alert-form {
+    @apply mb-5 rounded-lg border border-gray-600 bg-gray-900/45 p-4;
+  }
+  .alert-form-header {
+    @apply mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-300;
+  }
+  .alert-form-grid {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1;
+  }
+  .alert-form-field {
+    @apply flex flex-col gap-2 text-sm font-semibold text-gray-300;
+  }
+  .alert-input {
+    @apply h-11 rounded border border-gray-600 bg-gray-800 px-3 text-sm text-gray-100 placeholder:text-gray-500 transition-colors focus:border-yellow-500 focus:bg-gray-700/80 focus:outline-none;
+  }
+  .alert-create-btn {
+    @apply mt-4 inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded bg-yellow-500 px-4 text-sm font-semibold text-gray-900 transition-colors hover:bg-yellow-400 disabled:opacity-50;
+  }
+  .alert-items {
+    @apply flex max-h-[480px] flex-col gap-3 overflow-y-auto pr-1;
+  }
+  .alert-items-header {
+    @apply text-sm font-bold uppercase tracking-wide text-gray-500;
   }
   .alert-empty {
-    @apply px-6 py-8 text-center text-gray-500/50;
+    @apply rounded-lg border border-dashed border-gray-600 px-6 py-8 text-center text-gray-500/70;
   }
   .alert-item {
-    @apply p-4 rounded-lg bg-gray-700 border border-gray-600;
+    @apply rounded-lg border border-gray-600 bg-gray-700/70 p-4 transition-colors hover:border-yellow-500/50 hover:bg-gray-700;
+  }
+  .alert-item-inactive {
+    @apply opacity-70;
   }
   .alert-name {
-    @apply mb-2 text-lg text-yellow-500 font-semibold;
+    @apply mb-1 text-base text-yellow-500 font-semibold;
   }
   .alert-details {
-    @apply flex border-b pb-3 items-center justify-between gap-3 mb-2;
+    @apply mb-3 flex items-start justify-between gap-3 border-b border-gray-600 pb-3;
   }
   .alert-company {
-    @apply text-gray-400 text-base;
+    @apply text-sm text-gray-400;
   }
   .alert-price {
-    @apply text-gray-100 font-bold;
+    @apply text-sm font-bold text-gray-100;
   }
   .alert-actions {
-    @apply flex items-end justify-between;
+    @apply flex items-end justify-between gap-3 text-sm text-gray-300;
   }
   .alert-update-btn {
     @apply text-gray-400 rounded-full bg-transparent hover:bg-green-500/15 cursor-pointer;
   }
   .alert-delete-btn {
     @apply text-gray-400 rounded-full hover:bg-red-600/15 bg-transparent cursor-pointer transition-colors;
+  }
+  .alert-triggered-label {
+    @apply mt-3 w-fit rounded bg-teal-400/10 px-2 py-1 text-xs font-semibold text-teal-400;
+  }
+  .notification-trigger {
+    @apply relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded border border-gray-600 bg-gray-900/40 px-3 text-sm font-semibold text-gray-300 transition-colors hover:border-yellow-500/70 hover:bg-gray-700 hover:text-yellow-500;
+  }
+  .notification-trigger-label {
+    @apply hidden lg:inline;
+  }
+  .notification-badge {
+    @apply absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white ring-2 ring-gray-800;
+  }
+  .notification-drawer {
+    @apply fixed bottom-0 left-auto right-0 top-0 h-screen max-h-screen w-full max-w-md translate-x-0 translate-y-0 overflow-y-auto rounded-none border-l border-gray-600 bg-gray-800 p-5 text-gray-400 shadow-2xl shadow-black/40 sm:max-w-md;
+  }
+  .notification-drawer-top {
+    @apply flex items-start justify-between gap-4 border-b border-gray-600 pb-5 pr-8;
+  }
+  .notification-drawer-title {
+    @apply text-2xl font-bold text-gray-100;
+  }
+  .notification-drawer-description {
+    @apply mt-2 text-sm leading-6 text-gray-400;
+  }
+  .notification-read-btn {
+    @apply cursor-pointer rounded px-2 py-1 text-xs font-semibold text-yellow-500 hover:bg-yellow-500/10 disabled:cursor-not-allowed disabled:text-gray-500;
+  }
+  .notification-empty {
+    @apply px-4 py-16 text-center text-sm text-gray-500;
+  }
+  .notification-drawer-list {
+    @apply mt-5 flex flex-col gap-3;
+  }
+  .notification-item {
+    @apply flex w-full cursor-pointer items-start gap-3 rounded-lg border border-gray-600 bg-gray-900/40 px-4 py-4 transition-colors hover:border-yellow-500/60 hover:bg-gray-700;
+  }
+  .notification-dot {
+    @apply mt-1.5 h-2 w-2 shrink-0 rounded-full bg-yellow-500;
+  }
+  .notification-dot-read {
+    @apply bg-gray-600;
+  }
+  .notification-content {
+    @apply flex min-w-0 flex-col gap-1;
+  }
+  .notification-title {
+    @apply text-sm font-semibold text-gray-100;
+  }
+  .notification-message {
+    @apply line-clamp-2 text-xs leading-5 text-gray-400;
+  }
+  .notification-time {
+    @apply text-xs text-gray-500;
+  }
+  .stock-page {
+    @apply space-y-8;
+  }
+  .stock-hero {
+    @apply flex flex-col gap-6 rounded-lg border border-gray-600 bg-gray-800 p-5 shadow-xl shadow-black/20 md:flex-row md:items-center md:justify-between md:p-6;
+  }
+  .stock-hero-main {
+    @apply flex min-w-0 items-center gap-4;
+  }
+  .stock-logo,
+  .stock-logo-fallback {
+    @apply flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-gray-600 bg-white object-contain p-2 text-2xl font-bold text-gray-900;
+  }
+  .stock-eyebrow {
+    @apply mb-2 text-xs font-bold uppercase tracking-wide text-yellow-500;
+  }
+  .stock-hero-title {
+    @apply text-4xl font-bold leading-none text-gray-100 md:text-5xl;
+  }
+  .stock-hero-company {
+    @apply mt-2 text-base leading-6 text-gray-400;
+  }
+  .stock-hero-actions {
+    @apply flex w-full flex-col gap-3 md:w-[280px];
+  }
+  .stock-price-card {
+    @apply rounded-lg border border-gray-600 bg-gray-900/60 p-4;
+  }
+  .stock-price-card span,
+  .stock-metric-card span {
+    @apply block text-xs font-bold uppercase tracking-wide text-gray-500;
+  }
+  .stock-price-card strong {
+    @apply mt-2 block text-3xl font-bold text-gray-100;
+  }
+  .stock-price-card em {
+    @apply mt-1 block text-sm font-bold not-italic;
+  }
+  .stock-metrics-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4;
+  }
+  .stock-metric-card {
+    @apply min-w-0 rounded-lg border border-gray-600 bg-gray-800 p-4;
+  }
+  .stock-metric-card strong {
+    @apply mt-2 block truncate text-lg font-bold text-gray-100;
+  }
+  .stock-details-layout {
+    @apply grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_390px];
+  }
+  .stock-chart-column,
+  .stock-insight-column {
+    @apply flex flex-col gap-6;
+  }
+  .stock-insight-column {
+    @apply xl:sticky xl:top-24 xl:h-fit;
+  }
+  .stock-widget-panel {
+    @apply overflow-hidden rounded-lg border border-gray-600 bg-gray-800 p-4;
+  }
+  .stock-symbol-panel {
+    @apply p-0;
+  }
+  .stock-panel-title {
+    @apply text-lg font-bold text-gray-100;
+  }
+  .stock-panel-copy {
+    @apply mt-2 text-sm leading-6 text-gray-400;
   }
 }
 

@@ -3,16 +3,29 @@ import {
     NEWS_SUMMARY_EMAIL_PROMPT,
     PERSONALIZED_WELCOME_EMAIL_PROMPT,
 } from "@/lib/inngest/prompts";
-import { sendNewsSummaryEmail, sendWelcomeEmail } from "@/lib/nodemailer";
+import { sendNewsSummaryEmail, sendPriceAlertEmail, sendWelcomeEmail } from "@/lib/nodemailer";
 import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
 import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
-import { getNews } from "@/lib/actions/finnhub.actions";
-import { getFormattedTodayDate } from "@/lib/utils";
+import { fetchJSON, getNews } from "@/lib/actions/finnhub.actions";
+import { formatPrice, getFormattedTodayDate } from "@/lib/utils";
+import { connectToDatabase } from "@/database/mongoose";
+import { PriceAlert } from "@/database/models/alert.model";
+import { Notification } from "@/database/models/notification.model";
+import { ObjectId } from "mongodb";
 
 type UsersForNewsEmailResult = Awaited<ReturnType<typeof getAllUsersForNewsEmail>>;
 type UserForNewsEmail = NonNullable<UsersForNewsEmailResult>[number];
 type NewsResult = Awaited<ReturnType<typeof getNews>>;
 type MarketNewsArticle = NonNullable<NewsResult>[number];
+const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
+type PriceAlertRecord = {
+    _id: unknown;
+    userId: string;
+    symbol: string;
+    company: string;
+    alertType: "upper" | "lower";
+    threshold: number;
+};
 
 export const sendSignUpEmail = inngest.createFunction(
     {
@@ -146,5 +159,136 @@ export const sendDailyNewsSummary = inngest.createFunction(
         });
 
         return { success: true, message: "Daily news summary emails sent successfully" };
+    }
+);
+
+export const checkPriceAlerts = inngest.createFunction(
+    {
+        id: "check-price-alerts",
+        triggers: [{ event: "app/check.price.alerts" }, { cron: "*/30 * * * *" }],
+    },
+    async ({ step }) => {
+        const alerts = await step.run("load-active-alerts", async () => {
+            await connectToDatabase();
+            const items = await PriceAlert.find({ active: true }).sort({ createdAt: -1 }).lean();
+            return items as unknown as PriceAlertRecord[];
+        });
+
+        if (!alerts.length) {
+            return { success: true, message: "No active price alerts" };
+        }
+
+        const token = process.env.FINNHUB_API_KEY ?? process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? "";
+        if (!token) {
+            return { success: false, message: "FINNHUB API key is not configured" };
+        }
+
+        const usersById = await step.run("load-alert-users", async () => {
+            const mongoose = await connectToDatabase();
+            const db = mongoose.connection.db;
+            if (!db) throw new Error("MongoDB connection not connected");
+
+            const userIds = Array.from(new Set(alerts.map((alert) => String(alert.userId))));
+            const objectIds = userIds
+                .filter((id) => ObjectId.isValid(id))
+                .map((id) => new ObjectId(id));
+            const users = await db.collection("user").find(
+                { $or: [{ id: { $in: userIds } }, { _id: { $in: objectIds } }] },
+                { projection: { _id: 1, id: 1, email: 1, name: 1 } }
+            ).toArray();
+
+            const map = new Map<string, { email?: string; name?: string }>();
+            users.forEach((user) => {
+                const id = String(user.id || user._id || "");
+                if (id) map.set(id, { email: user.email, name: user.name });
+            });
+
+            return Object.fromEntries(map);
+        });
+
+        const triggered = await step.run("evaluate-alerts", async () => {
+            const quoteCache = new Map<string, number>();
+            const results: Array<{
+                alertId: string;
+                userId: string;
+                email: string;
+                symbol: string;
+                company: string;
+                alertType: "upper" | "lower";
+                threshold: number;
+                currentPrice: number;
+            }> = [];
+
+            for (const alert of alerts) {
+                const symbol = String(alert.symbol).toUpperCase();
+                let currentPrice = quoteCache.get(symbol);
+
+                if (currentPrice === undefined) {
+                    const quote = await fetchJSON<QuoteData>(`${FINNHUB_BASE_URL}/quote?symbol=${encodeURIComponent(symbol)}&token=${token}`, 60);
+                    currentPrice = quote.c || 0;
+                    quoteCache.set(symbol, currentPrice);
+                }
+
+                const threshold = Number(alert.threshold);
+                const didTrigger = alert.alertType === "upper"
+                    ? currentPrice >= threshold
+                    : currentPrice <= threshold;
+
+                if (!didTrigger) continue;
+
+                const userId = String(alert.userId);
+                const user = usersById[userId];
+                if (!user?.email) continue;
+
+                results.push({
+                    alertId: String(alert._id),
+                    userId,
+                    email: user.email,
+                    symbol,
+                    company: String(alert.company || symbol),
+                    alertType: alert.alertType,
+                    threshold,
+                    currentPrice,
+                });
+            }
+
+            return results;
+        });
+
+        await step.run("send-triggered-alerts", async () => {
+            await Promise.all(
+                triggered.map(async (alert) => {
+                    const currentPrice = formatPrice(alert.currentPrice);
+                    const targetPrice = formatPrice(alert.threshold);
+                    const direction = alert.alertType === "upper" ? "above" : "below";
+
+                    await sendPriceAlertEmail({
+                        email: alert.email,
+                        symbol: alert.symbol,
+                        company: alert.company,
+                        alertType: alert.alertType,
+                        currentPrice,
+                        targetPrice,
+                        timestamp: new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }),
+                    });
+
+                    await Notification.create({
+                        userId: alert.userId,
+                        type: "price-alert",
+                        title: `${alert.symbol} price alert triggered`,
+                        message: `${alert.symbol} moved ${direction} ${targetPrice}. Current price: ${currentPrice}.`,
+                        symbol: alert.symbol,
+                        url: `/stocks/${alert.symbol}`,
+                    });
+
+                    await PriceAlert.updateOne(
+                        { _id: alert.alertId },
+                        { $set: { active: false, lastTriggeredAt: new Date() } }
+                    );
+                })
+            );
+        });
+
+        return { success: true, message: `${triggered.length} price alerts triggered` };
     }
 );

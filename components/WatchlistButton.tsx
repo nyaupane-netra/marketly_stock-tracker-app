@@ -1,9 +1,8 @@
 "use client";
-import React, { useMemo, useState } from "react";
-
-// Minimal WatchlistButton implementation to satisfy page requirements.
-// This component focuses on UI contract only. It toggles local state and
-// calls onWatchlistChange if provided. Styling hooks match globals.css.
+import React, { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { toggleWatchlist } from "@/lib/actions/watchlist.actions";
 
 const WatchlistButton = ({
                              symbol,
@@ -14,24 +13,44 @@ const WatchlistButton = ({
                              onWatchlistChange,
                          }: WatchlistButtonProps) => {
     const [added, setAdded] = useState<boolean>(!!isInWatchlist);
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+    const cleanSymbol = symbol.toUpperCase();
 
     const label = useMemo(() => {
         if (type === "icon") return added ? "" : "";
+        if (isPending) return added ? "Removing..." : "Adding...";
         return added ? "Remove from Watchlist" : "Add to Watchlist";
-    }, [added, type]);
+    }, [added, isPending, type]);
 
     const handleClick = () => {
         const next = !added;
+        const previous = added;
+
         setAdded(next);
-        onWatchlistChange?.(symbol, next);
+
+        startTransition(async () => {
+            const result = await toggleWatchlist(cleanSymbol, company || cleanSymbol, next);
+
+            if (!result.success) {
+                setAdded(previous);
+                toast.error(result.error || "Failed to update watchlist");
+                return;
+            }
+
+            onWatchlistChange?.(cleanSymbol, next);
+            toast.success(next ? `${cleanSymbol} added to your watchlist` : `${cleanSymbol} removed from your watchlist`);
+            router.refresh();
+        });
     };
 
     if (type === "icon") {
         return (
             <button
-                title={added ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
-                aria-label={added ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
+                title={added ? `Remove ${cleanSymbol} from watchlist` : `Add ${cleanSymbol} to watchlist`}
+                aria-label={added ? `Remove ${cleanSymbol} from watchlist` : `Add ${cleanSymbol} to watchlist`}
                 className={`watchlist-icon-btn ${added ? "watchlist-icon-added" : ""}`}
+                disabled={isPending}
                 onClick={handleClick}
             >
                 <svg
@@ -53,7 +72,7 @@ const WatchlistButton = ({
     }
 
     return (
-        <button className={`watchlist-btn ${added ? "watchlist-remove" : ""}`} onClick={handleClick}>
+        <button className={`watchlist-btn ${added ? "watchlist-remove" : ""}`} disabled={isPending} onClick={handleClick}>
             {showTrashIcon && added ? (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

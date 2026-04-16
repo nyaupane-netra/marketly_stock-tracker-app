@@ -1,16 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import InputField from '@/components/forms/InputField';
 import FooterLink from '@/components/forms/FooterLink';
-import {signInWithEmail, signUpWithEmail} from "@/lib/actions/auth.actions";
+import {signInWithEmail} from "@/lib/actions/auth.actions";
 import {toast} from "sonner";
-import {signInEmail} from "better-auth/api";
 import {useRouter} from "next/navigation";
+import {authClient} from "@/lib/better-auth/client";
 
 const SignIn = () => {
     const router = useRouter()
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const {
         register,
         handleSubmit,
@@ -35,11 +37,48 @@ const SignIn = () => {
         }
     }
 
+    const handleGoogleSignIn = async () => {
+        setIsGoogleLoading(true);
+        try {
+            const { error } = await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+            });
+
+            if (error) {
+                toast.error("Google sign in failed", {
+                    description: error.message || "Check your Google OAuth configuration.",
+                });
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Google sign in failed", {
+                description: e instanceof Error ? e.message : "Please try again.",
+            });
+            setIsGoogleLoading(false);
+        }
+    };
+
     return (
         <>
             <h1 className="form-title">Welcome back</h1>
+            <p className="form-subtitle">Track your watchlist, alerts, and market news from one clean workspace.</p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <Button
+                type="button"
+                disabled={isGoogleLoading}
+                onClick={handleGoogleSignIn}
+                className="social-btn w-full mb-5"
+            >
+                <span className="google-mark">G</span>
+                {isGoogleLoading ? "Opening Google" : "Continue with Google"}
+            </Button>
+
+            <div className="auth-divider">
+                <span>or sign in with email</span>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="auth-form-stack">
                 <InputField
                     name="email"
                     label="Email"
