@@ -281,7 +281,9 @@ From the avatar menu, users can:
 
 ### Authentication Preview
 
-![Authentication dashboard preview](public/assets/images/sign-up-preview.png)
+![SignUp dashboard preview](public/assets/images/sign-up-preview.png)
+
+![SignIn dashboard preview](public/assets/images/sign-in-preview.png)
 
 ## Scripts
 
