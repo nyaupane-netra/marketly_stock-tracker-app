@@ -4,7 +4,7 @@ Marketly is a full-stack stock tracking application built with Next.js. It helps
 
 The app includes email/password authentication, Google sign-in, profile photo upload, watchlist categories, stock notes, a notification drawer, personalized market news, price alert emails, and responsive layouts for desktop and mobile.
 
-![Marketly dashboard preview](public/assets/images/dashboard-preview.png)
+![Marketly dashboard preview](public/assets/images/dashboard.png)
 
 ## Features
 
@@ -281,7 +281,7 @@ From the avatar menu, users can:
 
 ### Authentication Preview
 
-![Authentication dashboard preview](public/assets/images/dashboard-2.png)
+![Authentication dashboard preview](public/assets/images/sign-up-preview.png)
 
 ## Scripts
 
